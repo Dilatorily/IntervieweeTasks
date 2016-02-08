@@ -3,7 +3,6 @@ package com.interset.DataIntegrationTest.extractor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -19,18 +18,25 @@ public class JsonExtractor implements Extractor<Path>, Runnable {
 
     private Path path;
 
-    private List<BlockingQueue<BlockingQueueDTO>> outputQueues;
+    private BlockingQueue<BlockingQueueDTO> outputQueue;
 
-    public JsonExtractor(Path path, List<BlockingQueue<BlockingQueueDTO>> outputQueues) {
+    public JsonExtractor(Path path, BlockingQueue<BlockingQueueDTO> outputQueue) {
         mapper = new ObjectMapper();
         this.path = path;
-        this.outputQueues = outputQueues;
+        this.outputQueue = outputQueue;
     }
 
     @Override
     public void extract(Path path) {
         try {
-            Files.lines(path).map(line -> parseLine(line)).forEachOrdered(dto -> putToOutputQueues(dto));
+            Files.lines(path).map(line -> parseLine(line)).forEachOrdered(dto -> {
+                try {
+                    outputQueue.put(dto);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            });
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -54,26 +60,13 @@ public class JsonExtractor implements Extractor<Path>, Runnable {
         return parsedJson;
     }
 
-    private void putToOutputQueues(JsonDTO dto) {
-        outputQueues.forEach(queue -> {
-            try {
-                queue.put(dto);
-            } catch (InterruptedException e) {
-                // TODO
-                e.getStackTrace();
-            }
-        });
-    }
-
     private void completeExtraction () {
-        outputQueues.forEach(queue -> {
-            try {
-                queue.put(new DoneDTO());
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        });
+        try {
+            outputQueue.put(new DoneDTO());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override

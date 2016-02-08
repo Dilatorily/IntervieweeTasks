@@ -1,24 +1,31 @@
 package com.interset.DataIntegrationTest.dto;
 
-import java.nio.file.Path;
-
 import org.joda.time.DateTime;
 
 import com.interset.DataIntegrationTest.enums.Action;
 
 public class CsvDTO implements BlockingQueueDTO {
-
+    
     private DateTime timestamp;
 
     private Action action;
 
     private String user;
 
-    private Path folder;
+    private String folder;
 
     private String fileName;
 
     private String ip;
+    
+    public CsvDTO(DateTime timestamp, Action action, String user, String folder, String fileName, String ip) {
+        this.timestamp = timestamp;
+        this.action = action;
+        this.user = user;
+        this.folder = folder;
+        this.fileName = fileName;
+        this.ip = ip;
+    }
 
     public DateTime getTimestamp() {
         return timestamp;
@@ -44,11 +51,11 @@ public class CsvDTO implements BlockingQueueDTO {
         this.user = user;
     }
 
-    public Path getFolder() {
+    public String getFolder() {
         return folder;
     }
 
-    public void setFolder(Path folder) {
+    public void setFolder(String folder) {
         this.folder = folder;
     }
 
@@ -68,8 +75,8 @@ public class CsvDTO implements BlockingQueueDTO {
         this.ip = ip;
     }
 
-    @Override
-    public String toString() {
-        return timestamp.toString();
+    public Object[] toCsvLine() {
+        String[] line = {timestamp.toString(), action.toString(), user, folder, fileName, ip};
+        return line;
     }
 }

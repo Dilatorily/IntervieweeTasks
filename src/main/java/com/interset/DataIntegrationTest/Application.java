@@ -13,7 +13,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.interset.DataIntegrationTest.dto.BlockingQueueDTO;
 import com.interset.DataIntegrationTest.exception.InsufficientArgumentsException;
 import com.interset.DataIntegrationTest.extractor.JsonExtractor;
-import com.interset.DataIntegrationTest.transformer.CsvTransformer;
+import com.interset.DataIntegrationTest.loader.CsvLoader;
+import com.interset.DataIntegrationTest.loader.StatisticsLoader;
+import com.interset.DataIntegrationTest.transformer.JsonTransformer;
 
 public class Application {
 
@@ -36,32 +38,28 @@ public class Application {
             Path[] paths = application.getAndValidatePaths(args);
 
             // Initialize Queues
-            List<BlockingQueue<BlockingQueueDTO>> transformQueues = new ArrayList<BlockingQueue<BlockingQueueDTO>>();
-            transformQueues.add(new LinkedBlockingQueue<BlockingQueueDTO>());
-            transformQueues.add(new LinkedBlockingQueue<BlockingQueueDTO>());
-            BlockingQueue<BlockingQueueDTO> loadCsvQueue = new LinkedBlockingQueue<BlockingQueueDTO>();
-            //            BlockingQueue<JsonDTO> loadStatisticsQueue = new LinkedBlockingQueue<JsonDTO>();
+            BlockingQueue<BlockingQueueDTO> transformQueue = new LinkedBlockingQueue<BlockingQueueDTO>();
+            List<BlockingQueue<BlockingQueueDTO>> loadQueues = new ArrayList<BlockingQueue<BlockingQueueDTO>>();
+            loadQueues.add(new LinkedBlockingQueue<BlockingQueueDTO>());
+            loadQueues.add(new LinkedBlockingQueue<BlockingQueueDTO>());
 
             // Configure the ETL with the queues and paths
-            JsonExtractor extractor = new JsonExtractor(paths[0], transformQueues);
-            CsvTransformer csvTransformer = new CsvTransformer(transformQueues.get(0), loadCsvQueue);
-            //            StatisticsTransformer statisticsTransformer = new StatisticsTransformer(transformQueues.get(1), loadStatisticsQueue);
-            //            CsvLoader csvLoader = new CsvLoader(loadCsvQueue, paths[1]);
-            //            StatisticsLoader statisticsLoader = new StatisticsLoader(loadStatisticsQueue);
+            JsonExtractor extractor = new JsonExtractor(paths[0], transformQueue);
+            JsonTransformer csvTransformer = new JsonTransformer(transformQueue, loadQueues);
+            CsvLoader csvLoader = new CsvLoader(loadQueues.get(0), paths[1]);
+            StatisticsLoader statisticsLoader = new StatisticsLoader(loadQueues.get(1));
 
             // Initialize the ETL threads
             Thread extractorThread = new Thread(extractor);
             Thread csvTransformerThread = new Thread(csvTransformer);
-            //            Thread statisticsTransformerThread = new Thread(statisticsTransformer);
-            //            Thread csvLoaderThread = new Thread(csvLoader);
-            //            Thread statisticsLoaderThread = new Thread(statisticsLoader);
+            Thread csvLoaderThread = new Thread(csvLoader);
+            Thread statisticsLoaderThread = new Thread(statisticsLoader);
 
             // Start the ETL threads
             extractorThread.start();
             csvTransformerThread.start();
-            //            statisticsTransformerThread.start();
-            //            csvLoaderThread.start();
-            //            statisticsLoaderThread.start();
+            csvLoaderThread.start();
+            statisticsLoaderThread.start();
         } catch (InsufficientArgumentsException | IOException e) {
             System.err.println(e.getMessage());
         }

@@ -5,32 +5,42 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum Activity {
 
     @JsonProperty("createdDoc")
-    CREATED_DOCUMENT,
+    CREATED_DOCUMENT(true),
 
     @JsonProperty("deletedDoc")
-    DELETED_DOCUMENT,
+    DELETED_DOCUMENT(true),
 
     @JsonProperty("viewedDoc")
-    VIEWED_DOCUMENT,
+    VIEWED_DOCUMENT(true),
 
     @JsonProperty("addedText")
-    ADDED_TEXT,
+    ADDED_TEXT(true),
 
     @JsonProperty("changedText")
-    CHANGED_TEXT,
+    CHANGED_TEXT(true),
 
     @JsonProperty("deletedText")
-    DELETED_TEXT,
+    DELETED_TEXT(true),
 
     @JsonProperty("hashed")
-    HASHED,
+    HASHED(false),
 
     @JsonProperty("replicated")
-    REPLICATED,
+    REPLICATED(false),
 
     @JsonProperty("archived")
-    ARCHIVED,
+    ARCHIVED(true),
 
     @JsonProperty("restored")
-    RESTORED
+    RESTORED(false);
+    
+    private boolean isMapped;
+    
+    Activity(boolean isMapped) {
+        this.isMapped = isMapped;
+    }
+    
+    public boolean getIsMapped() {
+        return isMapped;
+    }
 }
