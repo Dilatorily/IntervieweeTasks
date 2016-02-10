@@ -1,3 +1,5 @@
 .*
 !.gitignore
-target
+dependency-reduced-pom.xml
+target/*
+!target/DataIntegrationTest-1.0-SNAPSHOT.jar
