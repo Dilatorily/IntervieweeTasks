@@ -27,7 +27,7 @@ public class ApplicationTests {
 
     @Test
     public void main_validParameters_completedEtl() {
-        Application.main(new String[] {"src/test/resources/metadataObjects100.json", "./output.csv"});
+        Application.main(new String[] {"src/test/resources/metadataObjects100.json", "target/output.csv"});
 
     }
 
@@ -39,13 +39,13 @@ public class ApplicationTests {
 
     @Test
     public void main_invalidJsonPath_exceptionThrownAndLogged() {
-        Application.main(new String[] {"\0", "./output.csv"});
+        Application.main(new String[] {"\0", "target/output.csv"});
         assertEquals("We couldn't convert the JSON file argument into a valid path!\n", errorStream.toString());
     }
 
     @Test
     public void main_absentJsonFile_exceptionThrownAndLogged() {
-        Application.main(new String[] {"src/test/resources/metadataObjects1000.json", "./output.csv"});
+        Application.main(new String[] {"src/test/resources/metadataObjects1000.json", "target/output.csv"});
         assertEquals("JSON file [src/test/resources/metadataObjects1000.json] doesn't exist!\n", errorStream.toString());
     }
 

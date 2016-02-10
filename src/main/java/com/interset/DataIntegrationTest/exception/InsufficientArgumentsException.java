@@ -7,9 +7,4 @@ public class InsufficientArgumentsException extends Exception {
     public InsufficientArgumentsException(String message) {
         super(message);
     }
-
-    public InsufficientArgumentsException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
-
 }

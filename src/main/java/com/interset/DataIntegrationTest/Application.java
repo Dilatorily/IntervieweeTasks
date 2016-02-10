@@ -38,6 +38,7 @@ public class Application {
             Path[] paths = application.getAndValidatePaths(args);
 
             // Initialize Queues
+            // Since we are using LinkedBlockingQueue, we could explode the memory with a large enough dataset
             BlockingQueue<BlockingQueueDTO> transformQueue = new LinkedBlockingQueue<BlockingQueueDTO>();
             List<BlockingQueue<BlockingQueueDTO>> loadQueues = new ArrayList<BlockingQueue<BlockingQueueDTO>>();
             loadQueues.add(new LinkedBlockingQueue<BlockingQueueDTO>());
@@ -50,6 +51,7 @@ public class Application {
             StatisticsLoader statisticsLoader = new StatisticsLoader(loadQueues.get(1));
 
             // Initialize the ETL threads
+            // We could possibly multithread the transformer, but it would need a refactor of the ETL
             Thread extractorThread = new Thread(extractor);
             Thread csvTransformerThread = new Thread(csvTransformer);
             Thread csvLoaderThread = new Thread(csvLoader);
